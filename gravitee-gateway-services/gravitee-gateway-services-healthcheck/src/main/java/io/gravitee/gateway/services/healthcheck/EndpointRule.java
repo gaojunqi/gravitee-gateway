@@ -13,37 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.gateway.http.core.loadbalancer;
+package io.gravitee.gateway.services.healthcheck;
 
 import io.gravitee.definition.model.Endpoint;
-import io.gravitee.gateway.api.http.loadbalancer.LoadBalancerStrategy;
+import io.gravitee.definition.model.services.healthcheck.Step;
+import io.gravitee.definition.model.services.schedule.Trigger;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class LoadBalancerSupportStrategy implements LoadBalancerStrategy {
+public interface EndpointRule {
 
-    private final List<Endpoint> endpoints;
+    String api();
 
-    protected LoadBalancerSupportStrategy(final List<Endpoint> endpoints) {
-        this.endpoints = endpoints;
-    }
+    Endpoint endpoint();
 
-    protected List<Endpoint> endpoints() {
-        return endpoints.parallelStream()
-                .filter(endpoint -> endpoint.getStatus().isDown())
-                .collect(Collectors.toList());
-    }
+    Trigger trigger();
 
-    @Override
-    public String next() {
-        Endpoint endpoint = nextEndpoint();
-        return (endpoint != null) ? endpoint.getName() : null;
-    }
-
-    protected abstract Endpoint nextEndpoint();
+    List<Step> steps();
 }
